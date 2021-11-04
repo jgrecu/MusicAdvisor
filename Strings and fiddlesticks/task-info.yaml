@@ -126,6 +126,12 @@ files:
         }
     }
   learner_created: false
+- name: src/advisor/Menu.java
+  visible: true
+  learner_created: true
 feedback_link: https://hyperskill.org/projects/62/stages/335/implement#comment
-status: Unchecked
+status: Solved
+feedback:
+  message: Congratulations!
+  time: Thu, 04 Nov 2021 09:43:19 UTC
 record: -1
