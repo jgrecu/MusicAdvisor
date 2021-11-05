@@ -4,23 +4,44 @@ import java.util.Scanner;
 
 public class Menu {
     private final Scanner scanner = new Scanner(System.in);
+    private final String ERROR = "Please, provide access for application.";
 
     public void start() {
         boolean isRunning = true;
+        boolean isAuthorized = false;
         while (isRunning) {
             String choice = scanner.nextLine();
             switch (choice) {
                 case "new":
-                    printNew();
+                    if (isAuthorized) {
+                        printNew();
+                    } else {
+                        System.out.println(ERROR);
+                    }
                     break;
                 case "featured":
-                    printFeatured();
+                    if (isAuthorized) {
+                        printFeatured();
+                    } else {
+                        System.out.println(ERROR);
+                    }
                     break;
                 case "categories":
-                    printCategories();
+                    if (isAuthorized) {
+                        printCategories();
+                    } else {
+                        System.out.println(ERROR);
+                    }
                     break;
                 case "playlists Mood":
-                    printMood();
+                    if (isAuthorized) {
+                        printMood();
+                    } else {
+                        System.out.println(ERROR);
+                    }
+                    break;
+                case "auth":
+                    isAuthorized = getAuthorized();
                     break;
                 case "exit":
                     System.out.println("---GOODBYE!---");
@@ -30,6 +51,14 @@ public class Menu {
                     break;
             }
         }
+    }
+
+    private boolean getAuthorized() {
+        String spotifyAPI = "https://accounts.spotify.com/authorize?client_id=2b90caa156094f3a91eac30f19349609";
+        String request = spotifyAPI + "&redirect_uri=http://localhost:8080&response_type=code";
+        System.out.println(request);
+        System.out.println("---SUCCESS---");
+        return true;
     }
 
 
