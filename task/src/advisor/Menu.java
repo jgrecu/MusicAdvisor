@@ -5,10 +5,10 @@ import java.util.Scanner;
 public class Menu {
     private final Scanner scanner = new Scanner(System.in);
     private final String ERROR = "Please, provide access for application.";
-    private String URL;
+    private String authorizationUrl;
 
-    public void setURL(String URL) {
-        this.URL = URL;
+    public void setAuthorizationUrl(String authorizationUrl) {
+        this.authorizationUrl = authorizationUrl;
     }
 
     public void start() {
@@ -59,8 +59,8 @@ public class Menu {
     }
 
     private boolean getAuthorized() {
-        if (URL == null) {
-            URL = "https://accounts.spotify.com";
+        if (authorizationUrl == null) {
+            authorizationUrl = "https://accounts.spotify.com";
         }
 
         Server server = new Server();
@@ -68,7 +68,9 @@ public class Menu {
         server.start();
         server.createContext();
         System.out.println("use this link to request the access code:");
-        System.out.println(URL + "/authorize?client_id=2b90caa156094f3a91eac30f19349609&response_type=code&redirect_uri=http://localhost:8080");
+        System.out.println(authorizationUrl +
+                            "/authorize?client_id=2b90caa156094f3a91eac30f19349609" +
+                            "&response_type=code&redirect_uri=http://localhost:8080");
         System.out.println("waiting for code...");
         while (!server.isCodeReceived()) {
             try {
@@ -79,7 +81,7 @@ public class Menu {
         }
         System.out.println("code received");
         System.out.println("making http request for access_token...");
-        String response = server.getTokenData(server.getCode(), URL);
+        String response = server.getTokenData(server.getCode(), authorizationUrl);
         System.out.println("response:");
         System.out.println(response);
         server.stop();
