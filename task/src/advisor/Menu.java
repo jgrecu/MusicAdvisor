@@ -85,8 +85,12 @@ public class Menu {
         System.out.println("response:");
         System.out.println(response);
         server.stop();
-        System.out.println("---SUCCESS---");
-        return true;
+        /*if (response.contains("access_token")) {*/
+            System.out.println("---SUCCESS---");
+            return true;
+        /*}
+        System.out.println("---FAILED---");
+        return false;*/
     }
 
 
