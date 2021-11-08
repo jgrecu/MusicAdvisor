@@ -896,6 +896,218 @@ files:
         }
     }
   learner_created: false
+- name: src/advisor/Menu.java
+  visible: true
+  text: |
+    package advisor;
+
+    import java.util.Scanner;
+
+    public class Menu {
+        private final Scanner scanner = new Scanner(System.in);
+        private final String ERROR = "Please, provide access for application.";
+        private String authorizationUrl;
+
+        public void setAuthorizationUrl(String authorizationUrl) {
+            this.authorizationUrl = authorizationUrl;
+        }
+
+        public void start() {
+            boolean isRunning = true;
+            boolean isAuthorized = false;
+            while (isRunning) {
+                String choice = scanner.nextLine();
+                switch (choice) {
+                    case "new":
+                        if (isAuthorized) {
+                            printNew();
+                        } else {
+                            System.out.println(ERROR);
+                        }
+                        break;
+                    case "featured":
+                        if (isAuthorized) {
+                            printFeatured();
+                        } else {
+                            System.out.println(ERROR);
+                        }
+                        break;
+                    case "categories":
+                        if (isAuthorized) {
+                            printCategories();
+                        } else {
+                            System.out.println(ERROR);
+                        }
+                        break;
+                    case "playlists Mood":
+                        if (isAuthorized) {
+                            printMood();
+                        } else {
+                            System.out.println(ERROR);
+                        }
+                        break;
+                    case "auth":
+                        isAuthorized = getAuthorized();
+                        break;
+                    case "exit":
+                        System.out.println("---GOODBYE!---");
+                        isRunning = false;
+                        break;
+                    default:
+                        break;
+                }
+            }
+        }
+
+        private boolean getAuthorized() {
+            if (authorizationUrl == null) {
+                authorizationUrl = "https://accounts.spotify.com";
+            }
+
+            Server server = new Server();
+
+            server.start();
+            server.createContext();
+            System.out.println("use this link to request the access code:");
+            System.out.println(authorizationUrl +
+                                "/authorize?client_id=2b90caa156094f3a91eac30f19349609" +
+                                "&response_type=code&redirect_uri=http://localhost:8080");
+            System.out.println("waiting for code...");
+            while (!server.isCodeReceived()) {
+                try {
+                    Thread.sleep(100);
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                }
+            }
+            System.out.println("code received");
+            System.out.println("making http request for access_token...");
+            String response = server.getTokenData(server.getCode(), authorizationUrl);
+            System.out.println("response:");
+            System.out.println(response);
+            server.stop();
+            /*if (response.contains("access_token")) {*/
+                System.out.println("---SUCCESS---");
+                return true;
+            /*}
+            System.out.println("---FAILED---");
+            return false;*/
+        }
+
+
+        private void printNew() {
+            System.out.println("---NEW RELEASES---\n" +
+                    "Mountains [Sia, Diplo, Labrinth]\n" +
+                    "Runaway [Lil Peep]\n" +
+                    "The Greatest Show [Panic! At The Disco]\n" +
+                    "All Out Life [Slipknot]");
+        }
+
+        private void printFeatured() {
+            System.out.println("---FEATURED---\n" +
+                    "Mellow Morning\n" +
+                    "Wake Up and Smell the Coffee\n" +
+                    "Monday Motivation\n" +
+                    "Songs to Sing in the Shower");
+        }
+
+        private void printCategories() {
+            System.out.println("---CATEGORIES---\n" +
+                    "Top Lists\n" +
+                    "Pop\n" +
+                    "Mood\n" +
+                    "Latin");
+        }
+
+        private void printMood() {
+            System.out.println("---MOOD PLAYLISTS---\n" +
+                    "Walk Like A Badass  \n" +
+                    "Rage Beats  \n" +
+                    "Arab Mood Booster  \n" +
+                    "Sunday Stroll");
+        }
+    }
+  learner_created: true
+- name: src/advisor/Server.java
+  visible: true
+  text: |
+    package advisor;
+
+    import com.sun.net.httpserver.HttpServer;
+
+    import java.io.IOException;
+    import java.net.InetSocketAddress;
+    import java.net.URI;
+    import java.net.http.HttpClient;
+    import java.net.http.HttpRequest;
+    import java.net.http.HttpResponse;
+
+    public class Server {
+        private String code;
+        private HttpServer httpServer;
+
+        public void start() {
+            try {
+                this.httpServer = HttpServer.create();
+                this.httpServer.bind(new InetSocketAddress(8080), 0);
+                httpServer.start();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        }
+
+        public void createContext() {
+            httpServer.createContext("/", exchange -> {
+                String msg = "Authorization code not found. Try again.";
+                String query = exchange.getRequestURI().getQuery();
+                if (query != null && query.matches("^code=.+")) {
+                    msg = "Got the code. Return back to your program.";
+                    this.code = query.replaceFirst("^code=", "");
+                }
+                exchange.sendResponseHeaders(200, msg.length());
+                exchange.getResponseBody().write(msg.getBytes());
+                exchange.getResponseBody().close();
+            });
+        }
+
+        public void stop() {
+            httpServer.stop(1);
+        }
+
+        public String getTokenData(String code, String url) {
+            HttpRequest request = HttpRequest
+                    .newBuilder()
+                    .header("Content-Type", "application/x-www-form-urlencoded")
+                    .POST(HttpRequest.BodyPublishers.ofString("grant_type=authorization_code&code=" + code + "&redirect_uri=http://localhost:8080"))
+                    .uri(URI.create(url + "/api/token"))
+                    .build();
+            try {
+                HttpClient client = HttpClient.newBuilder().build();
+                HttpResponse<String> response = client.send(request, HttpResponse.BodyHandlers.ofString());
+                this.code = null;
+                return response.body();
+            } catch (IOException | InterruptedException e) {
+                throw new IllegalStateException(e);
+            }
+        }
+
+        public String getCode() {
+            if (isCodeReceived()) {
+                return code;
+            } else {
+                throw new IllegalStateException("Code isn't received");
+            }
+        }
+
+        public boolean isCodeReceived() {
+            if (code != null) {
+                return true;
+            } else {
+                return false;
+            }
+        }
+    }
+  learner_created: true
 - name: test/TempWebServerMock.java
   visible: false
   text: |
