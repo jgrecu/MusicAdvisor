@@ -1,3 +1,4 @@
+import org.hyperskill.hstest.exception.outcomes.WrongAnswer;
 import org.hyperskill.hstest.mocks.web.WebPage;
 import org.hyperskill.hstest.mocks.web.WebServerMock;
 import org.hyperskill.hstest.mocks.web.request.HttpRequest;
@@ -53,7 +54,7 @@ public class TempWebServerMock extends WebServerMock {
         return access_token;
     }
 
-    private void checkRequestHeaders(HttpRequest request) throws WrongAnswer{
+    private void checkRequestHeaders(HttpRequest request) throws WrongAnswer {
         Map<String,String> requestHeaders = request.getHeaders();
 
         if(requestHeaders.containsKey(authorizationHeader)) {

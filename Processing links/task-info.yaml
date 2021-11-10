@@ -1111,6 +1111,7 @@ files:
 - name: test/TempWebServerMock.java
   visible: false
   text: |
+    import org.hyperskill.hstest.exception.outcomes.WrongAnswer;
     import org.hyperskill.hstest.mocks.web.WebPage;
     import org.hyperskill.hstest.mocks.web.WebServerMock;
     import org.hyperskill.hstest.mocks.web.request.HttpRequest;
@@ -1166,7 +1167,7 @@ files:
             return access_token;
         }
 
-        private void checkRequestHeaders(HttpRequest request) throws WrongAnswer{
+        private void checkRequestHeaders(HttpRequest request) throws WrongAnswer {
             Map<String,String> requestHeaders = request.getHeaders();
 
             if(requestHeaders.containsKey(authorizationHeader)) {
@@ -1242,5 +1243,36 @@ files:
     }
   learner_created: false
 feedback_link: https://hyperskill.org/projects/62/stages/338/implement#comment
-status: Unchecked
+status: Failed
+feedback:
+  message: |-
+    Wrong answer in test #8
+
+    There are no playlists in correct format on &quot;playlists {name}&quot; action. Make sure you correctly parsed the category name.
+
+    Please find below the output of your program during this failed test.
+    Note that the &#39;&gt;&#39; character indicates the beginning of the input line.
+
+    ---
+
+    Arguments: -access http://127.0.0.1:45678 -resource http://127.0.0.1:56789
+
+    &gt; auth
+    use this link to request the access code:
+    http://127.0.0.1:45678/authorize?client_id=2b90caa156094f3a91eac30f19349609&amp;response_type=code&amp;redirect_uri=http://localhost:8080
+    waiting for code...
+    Tester: making requests to redirect uri: http://localhost:8080
+    Tester: done request 1: Authorization code not found. Try again.
+    Tester: done request 2: Authorization code not found. Try again.
+    Tester: done request 3: Got the code. Return back to your program.
+    code received
+    making http request for access_token...
+    Success!
+    &gt; playlists Party Time
+    &quot;Noite Eletronica&quot;
+    http://open.spotify.com/user/spotifybrazilian/playlist/4k7EZPI3uKMz4aRRrLVfen
+
+    &quot;Festa Indie&quot;
+    http://open.spotify.com/user/spotifybrazilian/playlist/4HZh0C9y80GzHDbHZyX770
+  time: Wed, 10 Nov 2021 11:59:16 UTC
 record: -1
