@@ -15,6 +15,9 @@ public class Main {
             }
             menu.setAuthorizationUrl(argumentsMap.get("-access"));
             menu.setResourceUrl(argumentsMap.get("-resource"));
+        } else {
+            menu.setAuthorizationUrl("https://accounts.spotify.com");
+            menu.setResourceUrl("https://api.spotify.com");
         }
         menu.start();
     }

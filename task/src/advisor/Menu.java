@@ -19,6 +19,10 @@ public class Menu {
     private final String ERROR = "Please, provide access for application.";
     private String authorizationUrl;
     private String apiServerPath;
+    private final String newReleasesURL = apiServerPath + "/v1/browse/new-releases";
+    private final String featuredURL = apiServerPath + "/v1/browse/featured-playlists";
+    private final String categoriesURL = apiServerPath + "/v1/browse/categories";
+
 
     private JsonObject authResponse;
     private JsonObject queryResponse;
@@ -62,7 +66,7 @@ public class Menu {
                 case "playlists":
                     String category = option.substring(option.indexOf(" ") + 1);
                     if (isAuthorized) {
-                        printCategoryID(category);
+                        printCategoryByID(category);
                     } else {
                         System.out.println(ERROR);
                     }
@@ -81,9 +85,6 @@ public class Menu {
     }
 
     private boolean getAuthorized() {
-        if (authorizationUrl == null) {
-            authorizationUrl = "https://accounts.spotify.com";
-        }
 
         Server server = new Server();
 
@@ -107,7 +108,6 @@ public class Menu {
         authResponse = JsonParser.parseString(response).getAsJsonObject();
         server.stop();
         if (authResponse.has("access_token")) {
-            //System.out.println("access_token: " + authResponse.get("access_token").getAsString());
             System.out.println("Success!");
             return true;
         }
@@ -117,10 +117,7 @@ public class Menu {
 
 
     private void printNew() {
-        if (apiServerPath == null) {
-            apiServerPath = "https://api.spotify.com";
-        }
-        final String newReleasesURL = apiServerPath + "/v1/browse/new-releases";
+
         queryResponse = getQueryResponse(newReleasesURL);
 
         JsonObject albums = queryResponse.get("albums").getAsJsonObject();
@@ -140,10 +137,7 @@ public class Menu {
     }
 
     private void printFeatured() {
-        if (apiServerPath == null) {
-            apiServerPath = "https://api.spotify.com";
-        }
-        final String featuredURL = apiServerPath + "/v1/browse/featured-playlists";
+
         queryResponse = getQueryResponse(featuredURL);
 
         JsonArray items = queryResponse.get("playlists").getAsJsonObject().get("items").getAsJsonArray();
@@ -156,10 +150,7 @@ public class Menu {
     }
 
     private void printCategories() {
-        if (apiServerPath == null) {
-            apiServerPath = "https://api.spotify.com";
-        }
-        final String categoriesURL = apiServerPath + "/v1/browse/categories";
+
         queryResponse = getQueryResponse(categoriesURL);
 
         JsonArray categories = queryResponse.get("categories").getAsJsonObject().get("items").getAsJsonArray();
@@ -170,27 +161,25 @@ public class Menu {
         });
     }
 
-    private void printCategoryID(String category) {
+    private void printCategoryByID(String category) {
         String categoryID = getCategoryIdByCategoryName(category);
         if (categoryID == null) {
             System.out.println("Unknown category name.");
             return;
         }
-        if (apiServerPath == null) {
-            apiServerPath = "https://api.spotify.com";
-        }
+
         final String playlistsURL = apiServerPath + "/v1/browse/categories/" + categoryID + "/playlists";
         queryResponse = getQueryResponse(playlistsURL);
 
         if (queryResponse.has("error")) {
-            System.out.println("Specified id doesn't exist");
+            System.out.println(queryResponse.get("error").getAsJsonObject().get("message").getAsString());
             return;
         }
 
         JsonArray items = queryResponse.get("playlists").getAsJsonObject().get("items").getAsJsonArray();
         items.forEach(item -> {
             JsonObject playlist = item.getAsJsonObject();
-            System.out.println(playlist.get("name"));
+            System.out.println(playlist.get("name").getAsString());
             System.out.println(playlist.get("external_urls").getAsJsonObject().get("spotify").getAsString());
             System.out.println();
         });
@@ -214,10 +203,7 @@ public class Menu {
     }
 
     private String getCategoryIdByCategoryName(String categoryName)  {
-        if (apiServerPath == null) {
-            apiServerPath = "https://api.spotify.com";
-        }
-        final String categoriesURL = apiServerPath + "/v1/browse/categories";
+
         queryResponse = getQueryResponse(categoriesURL);
 
         JsonArray items = queryResponse.get("categories").getAsJsonObject().get("items").getAsJsonArray();
