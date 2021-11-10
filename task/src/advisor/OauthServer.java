@@ -9,7 +9,7 @@ import java.net.http.HttpClient;
 import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
 
-public class Server {
+public class OauthServer {
     private String code;
     private HttpServer httpServer;
 
@@ -46,6 +46,7 @@ public class Server {
                 .newBuilder()
                 .header("Content-Type", "application/x-www-form-urlencoded")
                 .POST(HttpRequest.BodyPublishers.ofString("grant_type=authorization_code&code=" + code + "&redirect_uri=http://localhost:8080"))
+                .headers("Authorization", "Basic /* put the bearer token*/")
                 .uri(URI.create(url + "/api/token"))
                 .build();
         try {
