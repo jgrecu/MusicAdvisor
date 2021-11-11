@@ -1,23 +1,26 @@
 package advisor;
 
-import java.util.HashMap;
-import java.util.Map;
-
 public class Main {
-    public static void main(String[] args) {
-        Map<String, String> argumentsMap = new HashMap<>();
+    public static void main(String[] args) throws Exception {
+        if (args.length > 1) {
 
-        if (args.length > 0 ) {
-            for (int i = 0; i < args.length; i +=2) {
-                if (args[i].startsWith("-")) {
-                    argumentsMap.put(args[i], args[i + 1]);
+            for (int i = 0; i < args.length - 1; i++)
+                switch (args[i]) {
+                    case "-access":
+                        Config.SERVER_PATH = args[i + 1];
+                        break;
+                    case "-resource":
+                        Config.API_PATH = args[i + 1];
+                        break;
+                    case "-page":
+                        Config.PAGE_SIZE = Integer.parseInt(args[i + 1]);
+                        break;
+                    default:
+                        break;
                 }
-            }
-            MenuController.setAuthorizationUrl(argumentsMap.get("-access"));
-            MenuController.setApiServerPath(argumentsMap.get("-resource"));
-            MenuController.setEntriesPerPage(argumentsMap.get("-page"));
         }
 
-        MenuController.start();
+        Advisor advisor = new Advisor();
+        advisor.start();
     }
 }
