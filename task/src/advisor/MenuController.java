@@ -27,12 +27,12 @@ public class MenuController {
     public MenuController() {
     }
 
-    public static void setEntriesPerPage(String entries) {
-        entriesPerPage = Integer.parseInt(entries);
+    public static void setEntriesPerPage(String numberOfEntries) {
+        entriesPerPage = Integer.parseInt(numberOfEntries);
     }
 
-    public static void setResourceUrl(String ServerPath) {
-        apiServerPath = ServerPath;
+    public static void setApiServerPath(String url) {
+        apiServerPath = url;
     }
 
     public static void setAuthorizationUrl(String authUrl) {
@@ -45,36 +45,36 @@ public class MenuController {
         String command = "";
         while (isRunning) {
             boolean isNext = true;
-            boolean based = true;
+            boolean isNewRequest = true;
             String option = scanner.nextLine().strip();
             if (!"next".equals(option) && !"prev".equals(option)) {
                 command = option;
             } else if ("prev".equals(option)) {
                 isNext = false;
-                based = false;
+                isNewRequest = false;
             } else {
                 isNext = true;
-                based = false;
+                isNewRequest = false;
             }
             String choice = command.contains(" ") ? command.substring(0, command.indexOf(" ")) : command;
             switch (choice) {
                 case "new":
                     if (isAuthorized) {
-                        MenuViewer.printNewReleases(entriesPerPage, isNext, based);
+                        MenuViewer.printNewReleases(entriesPerPage, isNext, isNewRequest);
                     } else {
                         System.out.println(ERROR);
                     }
                     break;
                 case "featured":
                     if (isAuthorized) {
-                        MenuViewer.printFeatures(entriesPerPage, isNext, based);
+                        MenuViewer.printFeatures(entriesPerPage, isNext, isNewRequest);
                     } else {
                         System.out.println(ERROR);
                     }
                     break;
                 case "categories":
                     if (isAuthorized) {
-                        MenuViewer.printCategoryNames(entriesPerPage, isNext, based);
+                        MenuViewer.printCategoryNames(entriesPerPage, isNext, isNewRequest);
                     } else {
                         System.out.println(ERROR);
                     }
@@ -82,7 +82,7 @@ public class MenuController {
                 case "playlists":
                     String category = option.substring(option.indexOf(" ") + 1);
                     if (isAuthorized) {
-                        MenuViewer.printPlaylists(category, entriesPerPage, isNext, based);
+                        MenuViewer.printPlaylists(category, entriesPerPage, isNext, isNewRequest);
                     } else {
                         System.out.println(ERROR);
                     }

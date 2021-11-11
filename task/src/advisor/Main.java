@@ -14,7 +14,7 @@ public class Main {
                 }
             }
             MenuController.setAuthorizationUrl(argumentsMap.get("-access"));
-            MenuController.setResourceUrl(argumentsMap.get("-resource"));
+            MenuController.setApiServerPath(argumentsMap.get("-resource"));
             MenuController.setEntriesPerPage(argumentsMap.get("-page"));
         }
 
